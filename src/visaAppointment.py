@@ -2,7 +2,7 @@ import json
 from src.webFunction import visaServer
 from playsound import playsound
 from time import sleep
-
+import traceback
 
 class visaAppointment():
     def __init__(self) -> None:
@@ -22,18 +22,21 @@ class visaAppointment():
 
                 # Abrimos el Appointment
                 avaible = self.visaServer.aviableAppointment()
-                print(f"Fecha disponible: {avaible}")
 
-                # Si existe se procede a encender la alarma
                 if (avaible):
+                    print("Date found")
                     try:
                         while(True):
                             NOMBRE_ARCHIVO = "alarm-clock.mp3"
                             playsound(NOMBRE_ARCHIVO)
                             sleep(10)
                     except KeyboardInterrupt:
+                        input("Presiona enter para cerrar el proceso")
                         self.visaServer.close()
                         quit()
+                        
+                else:
+                    print("Could not find available dates, log out and wait to log back in")
 
                 # Esperamos un rato
                 self.visaServer.logout()
@@ -45,8 +48,12 @@ class visaAppointment():
                     self.visaServer.close()
 
 
-        except:
+        except Exception as err:
+            traceback.print_exc()
             self.visaServer.close()
+
+        except KeyboardInterrupt:
+            pass
         
 
         
