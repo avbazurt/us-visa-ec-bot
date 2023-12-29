@@ -1,28 +1,28 @@
 import logging, os
 from logging import handlers
 
-
-class log(logging.getLoggerClass()):
+class Log(logging.getLoggerClass()):
     def __init__(self, name: str, level: int = logging.NOTSET) -> None:
         super().__init__(name, level)
 
         # Creo el stream
         stramHandler = logging.StreamHandler()
         formatter = logging.Formatter(
-                '%(asctime)s [%(levelname)-8s] Line %(lineno)-4s of %(filename)-20s: %(message)s')
+                '%(asctime)s [%(levelname)-8s] Line %(lineno)-4s of %(filename)-20s:  %(message)s')
         
         stramHandler.setFormatter(formatter)
         self.addHandler(stramHandler)
 
-        # Creo el FileHandler
+        # Verifico si existe la carpeta de log
         folder = "log"
-
-        if (not os.path.exists(folder)):
+        if not os.path.exists(folder):
             os.mkdir(folder)
 
-        fh = handlers.RotatingFileHandler(f"{folder}/app.log", maxBytes=(10485760*5), backupCount=5)
+        # Creo el FileHandler
+        fh = handlers.RotatingFileHandler(f"{folder}/app.log", maxBytes=(1048576*5), backupCount=5)
         fh.setFormatter(formatter)
         self.addHandler(fh)
 
         # Seteo el Level
         self.setLevel(level)
+

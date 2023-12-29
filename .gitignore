@@ -2,5 +2,6 @@ venv
 __pycache__
 geckodriver.log
 test.py
-log
-main.py
+.vscode
+*.db
+*.log

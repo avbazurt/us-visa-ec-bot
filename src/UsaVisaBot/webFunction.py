@@ -10,17 +10,32 @@ from selenium.webdriver.remote.webelement import WebElement
 
 from time import sleep
 from random import randint
-import json
-from src import AppLog
+import json, logging
+
+try:
+    from src.PyLog import Log
+    AppLog = Log(__name__)
+except Exception as ex:
+    AppLog = logging.getLogger(__name__)
+    AppLog.setLevel(logging.DEBUG)
+    stramHandler = logging.StreamHandler()
+    formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')    
+    stramHandler.setFormatter(formatter)
+    AppLog.addHandler(stramHandler)
+
 
 
 class visaServer():
-    def __init__(self) -> None:
+    def __init__(self, log_level:int = logging.CRITICAL) -> None:
+        # Seteo primero el log
+        AppLog.setLevel(log_level)
+
         # Creamos el _driver
         self._driver = webdriver.Firefox()
 
         self.url = "https://ais.usvisa-info.com/en-ec/niv/users/sign_in"
-        self.xpath = json.load(open("src/xpath.json")) 
+        self.xpath = json.load(open("src/UsaVisaBot/xpath.json")) 
         
         # Configuramos la pestana
         firefox_options = webdriver.FirefoxOptions()
@@ -64,8 +79,6 @@ class visaServer():
         self._get_element(By.XPATH, self.xpath["checkbox"]).click()
         self._get_element(By.XPATH, self.xpath["sign"]).click()
 
-
-
     def aviableAppointment(self)->bool:
         contador = 0
         max_intentos = randint(2,4)
@@ -99,13 +112,12 @@ class visaServer():
 
         return False
 
-
     def aviableDate(self) -> bool:
         self._get_element(By.XPATH, self.xpath["fecha"]).click()
         self._delay_random(1)
 
         # Primero localizo el mes actual
-        for i in range(3):
+        for i in range(2):
             _div_mes = self._get_element(By.CLASS_NAME, "ui-datepicker-group")
             mes_actual = _div_mes.find_element(By.CLASS_NAME, "ui-datepicker-month").text
             AppLog.info(f"Starting Scan of the month {mes_actual}")
